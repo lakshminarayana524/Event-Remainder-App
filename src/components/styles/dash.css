@@ -1,0 +1,30 @@
+/* Dash.css */
+
+.dash-container {
+    position: relative;
+    padding: 20px;
+}
+
+.add-button {
+    position: fixed;
+    top: 50px;
+    right: 20px;
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    border-radius: 50%;
+    width: 60px;
+    height: 60px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 24px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.3s;
+}
+
+.add-button:hover {
+    background-color: #0056b3;
+    transform: scale(1.1);
+}

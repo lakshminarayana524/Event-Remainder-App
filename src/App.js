@@ -1,23 +1,25 @@
-import logo from './logo.svg';
+import { BrowserRouter as Router , Route, Routes } from 'react-router-dom';
+import CreateEvent from './components/CreateEvent';
+import Home from './components/home'
+import Login from './components/login'
+import Signup from './components/signup'
+import Dash from './components/dash';
 import './App.css';
 
 function App() {
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      <Router>
+        <Routes>
+          <Route path='/' element={<Home/>} />
+          <Route path='/login' element ={<Login/>}/>
+          <Route path = '/signup' element={<Signup/>}/>
+          <Route path='/dash' element={<Dash/>}/>
+          <Route path='/create' element={<CreateEvent/>}/>
+          {/* <Route path='/allEvent' element={<Eventget/>}/> */}
+          <Route path='*' element={<Home/>}/>
+        </Routes>
+      </Router>
     </div>
   );
 }
