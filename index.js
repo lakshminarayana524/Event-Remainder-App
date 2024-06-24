@@ -1,0 +1,41 @@
+require("dotenv").config();
+const express = require("express")
+const session = require("express-session")
+const cors = require("cors")
+const bodyParser = require('body-parser');
+const MongoStore = require('connect-mongo')
+const connectDB = require('./config/db')
+const authRouter = require('./routes/authRoutes')
+const eventRouter = require('./routes/eventRoutes')
+
+const app=express();
+
+app.use(cors({
+    origin:"http://localhost:3000",
+    methods:["GET","POST","UPDATE","DELETE"],
+    credentials:true
+}))
+
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
+connectDB();
+
+app.use(session({
+    secret: process.env.SESSION_SECRET,
+    resave: false,
+    saveUninitialized: false,
+    store: MongoStore.create({ mongoUrl: process.env.MONGO_URL })
+}));
+
+app.get('/',(req,res)=>{
+    res.send("Hi,I am Here")
+})
+
+app.use('/api/auth',authRouter)
+app.use('/api/event',eventRouter)
+
+port =process.env.PORT || 3000;
+
+app.listen(port ,()=>{
+    console.log("Server is runnig "+port);
+})
