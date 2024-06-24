@@ -11,7 +11,8 @@ const eventRouter = require('./routes/eventRoutes')
 const app=express();
 
 app.use(cors({
-    origin:"http://localhost:3000",
+    origin:"https://my-event-remainder.vercel.app",
+    // origin:"http://localhost:3000",
     methods:["GET","POST","UPDATE","DELETE"],
     credentials:true
 }))
