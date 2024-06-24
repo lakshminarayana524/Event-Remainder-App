@@ -7,6 +7,7 @@ const MongoStore = require('connect-mongo')
 const connectDB = require('./config/db')
 const authRouter = require('./routes/authRoutes')
 const eventRouter = require('./routes/eventRoutes')
+const sendEmail = require('./config/mail')
 
 const app=express();
 
@@ -31,6 +32,18 @@ app.use(session({
 app.get('/',(req,res)=>{
     res.send("Hi,I am Here")
 })
+
+app.get('/send-test-email', async (req, res) => {
+    try {
+        await sendEmail('test@example.com', 'Test Subject', 'Test email content');
+        console.log("Test email sent successfully")
+        res.send('Test email sent successfully');
+    } catch (error) {
+        console.error('Error sending test email:', error);
+        res.status(500).send('Error sending test email');
+    }
+});
+
 
 app.use('/api/auth',authRouter)
 app.use('/api/event',eventRouter)
