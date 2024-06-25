@@ -21,8 +21,8 @@ connectDB();
 
 // CORS configuration
 app.use(cors({
-    // origin: "https://my-event-remainder.vercel.app",
-    origin:"http://localhost:3000",
+    origin: "https://my-event-remainder.vercel.app",
+    // origin:"http://localhost:3000",
     methods: ["GET", "POST", "PUT", "DELETE"], // Use "PUT" instead of "UPDATE"
     credentials: true
 }));
