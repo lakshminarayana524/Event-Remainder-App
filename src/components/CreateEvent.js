@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api from '../api';
 import './styles/create.css';
-import { toast } from 'react-toastify';
+import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
 const CreateEvent = () => {
@@ -22,7 +22,7 @@ const CreateEvent = () => {
         const verifySession = async () => {
             try {
                 const res = await api.get('/auth/verify-session');
-                if (res.data.msg === 'Session is valid') {
+                if (res) {
                     setIsSessionVerified(true);
                 } else {
                     navigate('/login');
@@ -68,6 +68,7 @@ const CreateEvent = () => {
                 <input type="datetime-local" name="reminderDate" value={formData.reminderDate} onChange={handleChange} required />
                 <button type="submit">Create Event</button>
             </form>
+            <ToastContainer/>
         </div>
     );
 };

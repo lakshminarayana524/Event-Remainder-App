@@ -29,9 +29,9 @@ const EventsSchedule = () => {
                                     <div className='event-card' key={event.id}>
                                         <div className='event-name'>
                                             <h3>{event.name}</h3>
-                                            <div className='event-details'>
-                                                <p className='event-desc'>{event.description}</p>
-                                                <p className='event-time'>{new Date(event.time).toLocaleString()}</p>
+                                            <div className='event-details' key={event._id}>
+                                                <p className='event-desc'>{event.title}</p>
+                                                <p className='event-time'>{new Date(event.eventDate).toLocaleString()}</p>
                                             </div>
                                         </div>
                                     </div>
