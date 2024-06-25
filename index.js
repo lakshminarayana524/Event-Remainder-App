@@ -7,7 +7,8 @@ const MongoStore = require('connect-mongo')
 const connectDB = require('./config/db')
 const authRouter = require('./routes/authRoutes')
 const eventRouter = require('./routes/eventRoutes')
-const sendEmail = require('./config/mail')
+const sendEmail = require('./config/mail');
+const authMiddleware = require("./middleware/authMiddleware");
 
 const app=express();
 
@@ -46,7 +47,7 @@ app.get('/send-test-email', async (req, res) => {
 
 
 app.use('/api/auth',authRouter)
-app.use('/api/event',eventRouter)
+app.use('/api/event',authMiddleware,eventRouter)
 
 port =process.env.PORT || 3000;
 
