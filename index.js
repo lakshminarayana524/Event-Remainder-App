@@ -18,12 +18,9 @@ const app = express();
 connectDB();
 
 // Middleware setup
-
-// CORS configuration
 app.use(cors({
     origin: "https://my-event-remainder.vercel.app",
-    // origin:"http://localhost:3000",
-    methods: ["GET", "POST", "PUT", "DELETE"], // Use "PUT" instead of "UPDATE"
+    methods: ["GET", "POST", "PUT", "DELETE"],
     credentials: true
 }));
 
@@ -36,25 +33,25 @@ app.use(session({
     secret: process.env.SESSION_SECRET,
     resave: false,
     saveUninitialized: false,
-    store: MongoStore.create({ mongoUrl: process.env.MONGO_URL }), // Use mongoUrl
+    store: MongoStore.create({ mongoUrl: process.env.MONGO_URL }),
     cookie: {
         maxAge: 1000 * 60 * 60 * 3,
         httpOnly: true,
-        secure: process.env.NODE_ENV === 'production', // Set to true if using HTTPS
-        sameSite: 'Strict'  // Adjust according to your needs
+        secure: true, // This should be true in production
+        sameSite: 'None' // This is important for cross-origin requests
     }
 }));
 
 // Debugging middleware
 app.use((req, res, next) => {
-    // console.log('Session', req.session.userId);
-    // console.log('Cookies:', req.cookies);
+    console.log('Session:', req.session);
+    console.log('Cookies:', req.cookies);
     next();
 });
 
 // Routes
 app.get('/', (req, res) => {
-    res.send("Hi, I am Here"); 
+    res.send("Hi, I am Here");
 });
 
 app.get('/send-test-email', async (req, res) => {
