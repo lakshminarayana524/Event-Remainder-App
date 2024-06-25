@@ -1,10 +1,12 @@
-import axios from 'axios';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import api from '../api';
+import { useNavigate } from 'react-router-dom';
 
 // Function to check if the user is authenticated
 export const isAuth = async (navigate) => {
+   
+
     try {
         const response = await api.get(`/auth/verify-session`);
         if (response.data.isAuthenticated) {
