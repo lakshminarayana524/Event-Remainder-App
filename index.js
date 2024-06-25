@@ -28,7 +28,11 @@ app.use(session({
     resave: false,
     saveUninitialized: false,
     store: MongoStore.create({ mongoUrl: process.env.MONGO_URL }),
-    cookie: { secure: false, httpOnly: false } // Ensure cookies are set correctly
+    cookie: {
+        secure: process.env.NODE_ENV === 'production', // Set to true if using HTTPS
+        httpOnly: true,
+        sameSite: 'None' // Set to 'None' for cross-origin requests
+    }// Ensure cookies are set correctly
 }));
 
 app.get('/', (req, res) => {
