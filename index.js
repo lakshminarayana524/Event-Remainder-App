@@ -1,6 +1,7 @@
 require("dotenv").config();
 const express = require("express");
 const session = require("express-session");
+const cookieParser = require('cookie-parser');
 const cors = require("cors");
 const bodyParser = require('body-parser');
 const MongoStore = require('connect-mongo');
@@ -9,34 +10,48 @@ const authRouter = require('./routes/authRoutes');
 const eventRouter = require('./routes/eventRoutes');
 const sendEmail = require('./config/mail');
 const authMiddleware = require('./middleware/authMiddleware');
+const mongoose = require('mongoose'); // Import mongoose
 
 const app = express();
 
+// Database connection
+connectDB();
+
+// Middleware setup
 app.use(cors({
-    origin: "https://my-event-remainder.vercel.app",
-    // origin:"http://localhost:3000",
-    methods: ["GET", "POST", "UPDATE", "DELETE"],
+    origin: "http://localhost:3000", // Adjust according to your frontend URL
+    methods: ["GET", "POST", "PUT", "DELETE"], // Use "PUT" instead of "UPDATE"
     credentials: true
 }));
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
-connectDB();
+app.use(cookieParser());
 
+// Session setup
 app.use(session({
     secret: process.env.SESSION_SECRET,
     resave: false,
     saveUninitialized: false,
-    store: MongoStore.create({ mongoUrl: process.env.MONGO_URL }),
+    store: MongoStore.create({ mongoUrl: process.env.MONGO_URL }), // Use mongoUrl
     cookie: {
-        secure: process.env.NODE_ENV === 'production', // Set to true if using HTTPS
+        maxAge: 1000 * 60 * 60 * 3,
         httpOnly: true,
-        sameSite: 'None' // Set to 'None' for cross-origin requests
-    }// Ensure cookies are set correctly
+        secure: false,  // Set to true if using HTTPS
+        sameSite: 'Strict'  // Adjust according to your needs
+    }
 }));
 
+// Debugging middleware
+app.use((req, res, next) => {
+    // console.log('Session', req.session.userId);
+    // console.log('Cookies:', req.cookies);
+    next();
+});
+
+// Routes
 app.get('/', (req, res) => {
-    res.send("Hi, I am Here");
+    res.send("Hi, I am Here"); 
 });
 
 app.get('/send-test-email', async (req, res) => {
@@ -53,8 +68,8 @@ app.get('/send-test-email', async (req, res) => {
 app.use('/api/auth', authRouter);
 app.use('/api/event', authMiddleware, eventRouter);
 
+// Start server
 const port = process.env.PORT || 3000;
-
 app.listen(port, () => {
     console.log("Server is running on " + port);
 });
