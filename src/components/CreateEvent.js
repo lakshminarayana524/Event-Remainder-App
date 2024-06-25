@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api from '../api';
 import './styles/create.css';
@@ -13,6 +13,28 @@ const CreateEvent = () => {
         eventDate: '',
         reminderDate: ''
     });
+
+    // State to track session verification
+    const [isSessionVerified, setIsSessionVerified] = useState(false);
+
+    // Verify session on component mount
+    useEffect(() => {
+        const verifySession = async () => {
+            try {
+                const res = await api.get('/auth/verify-session');
+                if (res.data.msg === 'Session is valid') {
+                    setIsSessionVerified(true);
+                } else {
+                    navigate('/login');
+                }
+            } catch (error) {
+                console.error('Session verification failed:', error);
+                navigate('/login');
+            }
+        };
+
+        verifySession();
+    }, [navigate]);
 
     const handleChange = (e) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -31,6 +53,10 @@ const CreateEvent = () => {
             toast.error('Failed to create event. Please try again.');
         }
     };
+
+    if (!isSessionVerified) {
+        return <div>Loading...</div>;
+    }
 
     return (
         <div className="create-event-container">
