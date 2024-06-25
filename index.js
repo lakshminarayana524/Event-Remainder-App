@@ -14,6 +14,8 @@ const mongoose = require('mongoose'); // Import mongoose
 
 const app = express();
 
+app.set("trust proxy", 1);
+
 // Database connection
 connectDB();
 
