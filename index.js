@@ -40,7 +40,7 @@ app.use(session({
         maxAge: 1000 * 60 * 60 * 3,
         httpOnly: true,
         secure: true, // This should be true in production
-        sameSite: 'None' // This is important for cross-origin requests
+        sameSite: 'Strict' // This is important for cross-origin requests
     }
 }));
 
