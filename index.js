@@ -35,7 +35,7 @@ app.get('/',(req,res)=>{
 
 app.get('/send-test-email', async (req, res) => {
     try {
-        await sendEmail('test@example.com', 'Test Subject', 'Test email content');
+        await sendEmail('myeventremainder@gmail.com', 'Test Subject', 'Test email content');
         console.log("Test email sent successfully")
         res.send('Test email sent successfully');
     } catch (error) {

@@ -19,10 +19,21 @@ const CreateEvent = async (req, res) => {
     try {
         const { title, description, eventDate, reminderDate } = req.body;
         console.log(title, description, eventDate, reminderDate);
+
+        if (!req.session.userId) {
+            return res.status(400).json({ error: 'User not logged in' });
+        }
+        
         if (new Date(eventDate) < new Date() || new Date(reminderDate) < new Date()) {
             return res.status(400).json({ error: 'Event date or reminder date cannot be in the past' });
         }
-        console.log('test 1');
+        
+        console.log('User ID:', req.session.userId);
+        const user = await User.findById(req.session.userId);
+
+        if (!user) {
+            return res.status(404).json({ error: 'User not found' });
+        }
 
         const newEvent = new Event({
             user: req.session.userId,
@@ -42,6 +53,9 @@ const CreateEvent = async (req, res) => {
         cron.schedule(`${reminderDateTime.getMinutes()} ${reminderDateTime.getHours()} ${reminderDateTime.getDate()} ${reminderDateTime.getMonth() + 1} *`, async () => {
             try {
                 const user = await User.findById(req.session.userId);
+                if (!user) {
+                    throw new Error('User not found during cron job');
+                }
                 await sendEmail(user.email, 'Event Reminder', `Hello ${user.name}, this is a reminder for your event: ${title}`);
                 newEvent.notified = true;
                 console.log('test 3');
@@ -53,6 +67,7 @@ const CreateEvent = async (req, res) => {
             scheduled: true,
             timezone: "Asia/Kolkata"
         });
+
         console.log('test 4');
         res.json({ msg: "Event Created", savedEvent });
     } catch (err) {
@@ -60,5 +75,6 @@ const CreateEvent = async (req, res) => {
         console.log("Event not created", err);
     }
 }
+
 
 module.exports = { CreateEvent, getEvents };
