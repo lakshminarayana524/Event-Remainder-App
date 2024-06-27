@@ -13,8 +13,8 @@ const Dash = () => {
     useEffect(() => {
         const checkAuth = async () => {
             const authenticated = await isAuth(navigate);
-            if (authenticated) {
-                console.log("logged in");
+            if (!authenticated) {
+                console.log("not auth");
             }
         };
         checkAuth();

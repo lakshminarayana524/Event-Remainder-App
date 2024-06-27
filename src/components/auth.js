@@ -1,24 +1,20 @@
+import api from '../api';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import api from '../api';
-import { useNavigate } from 'react-router-dom';
 
-// Function to check if the user is authenticated
 export const isAuth = async (navigate) => {
-   
-
     try {
-        const response = await api.get(`/auth/verify-session`);
+        const response = await api.get('/auth/verify-session', { withCredentials: true });
         if (response.data.isAuthenticated) {
             return true;
         } else {
-            navigate('/login'); // Redirect to login page
+            navigate('/login');
             return false;
         }
     } catch (error) {
         console.error('Error checking authentication:', error);
         toast.error('Something went wrong. Please try again.');
-        navigate('/login'); // Redirect to login page
+        navigate('/login');
         return false;
     }
 };

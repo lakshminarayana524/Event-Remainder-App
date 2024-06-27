@@ -4,6 +4,7 @@ import api from '../api';
 import './styles/create.css';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { isAuth } from './auth';
 
 const CreateEvent = () => {
     const navigate = useNavigate();
@@ -14,26 +15,16 @@ const CreateEvent = () => {
         reminderDate: ''
     });
 
-    // State to track session verification
-    const [isSessionVerified, setIsSessionVerified] = useState(false);
-
-    // Verify session on component mount
     useEffect(() => {
-        const verifySession = async () => {
-            try {
-                const res = await api.get('/auth/verify-session');
-                if (res) {
-                    setIsSessionVerified(true);
-                } else {
-                    navigate('/login');
-                }
-            } catch (error) {
-                console.error('Session verification failed:', error);
+        const checkAuth = async () => {
+            const authenticated = await isAuth(navigate);
+            if (authenticated) {
+                console.log('Authenticated')
+            }else{
                 navigate('/login');
-            }
+            }   
         };
-
-        verifySession();
+        checkAuth();
     }, [navigate]);
 
     const handleChange = (e) => {
@@ -54,9 +45,9 @@ const CreateEvent = () => {
         }
     };
 
-    if (!isSessionVerified) {
-        return <div>Loading...</div>;
-    }
+    // if (!isSessionVerified) {
+    //     return <div>Loading...</div>;
+    // }
 
     return (
         <div className="create-event-container">
@@ -68,7 +59,7 @@ const CreateEvent = () => {
                 <input type="datetime-local" name="reminderDate" value={formData.reminderDate} onChange={handleChange} required />
                 <button type="submit">Create Event</button>
             </form>
-            <ToastContainer/>
+            <ToastContainer />
         </div>
     );
 };

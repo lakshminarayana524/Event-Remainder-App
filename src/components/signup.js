@@ -43,7 +43,6 @@ const Signup = () => {
             return;
         }
         api.post(`/auth/signup`, { name, email,phoneNumber:phone ,password })
-        //  api.post(`https://movie-library-backend-kxe0.onrender.com/signup`, { name, email, password })
 
             .then((res) => {
                 if (res.data.msg === 'Email already exist') {

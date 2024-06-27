@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import './styles/login.css';
-import axios from 'axios';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { useNavigate } from 'react-router-dom';
@@ -11,37 +10,32 @@ const Login = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [loading, setLoading] = useState(false);
-    const [islog,setlog]=useState(false);
+    const [islog, setlog] = useState(false);
     const navigate = useNavigate();
-
-    axios.defaults.withCredentials = true;
 
     const handleSubmit = async (e) => {
         e.preventDefault();
         setLoading(true);
-    
+
         try {
             const res = await api.post(`/auth/login`, { email, password });
-            // const res = await axios.post(`https://movie-library-backend-kxe0.onrender.com/login`, { email, password });
 
             if (res.data.msg === 'Login Successful') {
-                // localStorage.setItem('userId', res.data.userId); 
-                navigate('/dash'); // Navigate to loading screen
+                localStorage.setItem('token', res.data.token);
+                navigate('/dash');
                 setLoading(false);
-               
             } else {
-                toast.error(res.data.msg,{ autoClose: 3000 });
-                setLoading(false)
+                toast.error(res.data.msg, { autoClose: 3000 });
+                setLoading(false);
             }
         } catch (err) {
             console.error("Login failed:", err);
-            toast.error('Login failed',{ autoClose: 3000 });
-            setLoading(false)
+            toast.error('Login failed', { autoClose: 3000 });
+            setLoading(false);
         } finally {
             setLoading(false);
         }
     };
-    
 
     if (loading) {
         return <Loader />;

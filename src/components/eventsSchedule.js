@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import './styles/eventsch.css'
+import './styles/eventsch.css';
 import api from '../api';
 
 const EventsSchedule = () => {
@@ -26,12 +26,14 @@ const EventsSchedule = () => {
                         {events.length > 0 ? (
                             <div className='event-cards'>
                                 {events.map(event => (
-                                    <div className='event-card' key={event.id}>
+                                    <div className='event-card' key={event._id}>
                                         <div className='event-name'>
-                                            <h3>{event.name}</h3>
-                                            <div className='event-details' key={event._id}>
-                                                <p className='event-desc'>{event.title}</p>
+                                            <h3>{event.title}</h3>
+                                            <div className='event-details'>
+                                                <p className='event-desc'>{event.description}</p>
                                                 <p className='event-time'>{new Date(event.eventDate).toLocaleString()}</p>
+                                                <p className='event-time'>{new Date(event.reminderDate).toLocaleString()}</p>
+
                                             </div>
                                         </div>
                                     </div>
