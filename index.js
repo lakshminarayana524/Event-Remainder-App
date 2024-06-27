@@ -8,9 +8,7 @@ const MongoStore = require('connect-mongo');
 const connectDB = require('./config/db');
 const authRouter = require('./routes/authRoutes');
 const eventRouter = require('./routes/eventRoutes');
-const sendEmail = require('./config/mail');
-const authMiddleware = require('./middleware/authMiddleware');
-const mongoose = require('mongoose'); // Import mongoose
+const sendEmail = require('./config/mail')
 
 const app = express();
 
@@ -21,8 +19,7 @@ connectDB();
 
 // Middleware setup
 app.use(cors({
-    origin: "https://my-event-remainder.vercel.app",
-    // origin:"http://localhost:3000",
+    origin: "http://localhost:3000",
     methods: ["GET", "POST", "PUT", "DELETE"],
     credentials: true
 }));
@@ -38,19 +35,12 @@ app.use(session({
     saveUninitialized: false,
     store: MongoStore.create({ mongoUrl: process.env.MONGO_URL }),
     cookie: {
-        maxAge: 1000 * 60 * 60 * 3,
+        maxAge: 1000 * 60 * 60 * 3, // 3 hours
         httpOnly: true,
-        secure: true, // This should be true in production
-        sameSite: 'Strict' // Important for cross-origin requests
+        secure: process.env.NODE_ENV === 'production', // Use secure cookies in production
+        sameSite: 'strict' // Important for cross-origin requests
     }
 }));
-
-/**/// Debugging middleware
-app.use((req, res, next) => {
-    console.log('Session:', req.session);
-    console.log('Cookies:', req.cookies);
-    next();
-});
 
 // Routes
 app.get('/', (req, res) => {
@@ -60,16 +50,14 @@ app.get('/', (req, res) => {
 app.get('/send-test-email', async (req, res) => {
     try {
         await sendEmail('myeventremainder@gmail.com', 'Test Subject', 'Test email content');
-        console.log("Test email sent successfully");
         res.send('Test email sent successfully');
     } catch (error) {
         console.error('Error sending test email:', error);
         res.status(500).send('Error sending test email');
     }
 });
-
 app.use('/api/auth', authRouter);
-app.use('/api/event', authMiddleware, eventRouter);
+app.use('/api/event', eventRouter);
 
 // Start server
 const port = process.env.PORT || 3000;
