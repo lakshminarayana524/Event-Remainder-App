@@ -1,6 +1,6 @@
 const nodemailer = require('nodemailer');
 
-console.log(process.env.EMAIL_PASSWORD);
+// console.log(process.env.EMAIL_PASSWORD);
 
 const transporter = nodemailer.createTransport({
     host: 'smtp.gmail.com',

@@ -19,8 +19,8 @@ connectDB();
 
 // Middleware setup
 app.use(cors({
-    // origin: "http://localhost:3000",
-    origin:"https://my-event-remainder.vercel.app",
+    origin: "https://my-event-remainder.vercel.app",
+    // origin:"http://localhost:3000",
     methods: ["GET", "POST", "PUT", "DELETE"],
     credentials: true
 }));
@@ -38,8 +38,8 @@ app.use(session({
     cookie: {
         maxAge: 1000 * 60 * 60 * 3, // 3 hours
         httpOnly: true,
-        secure: true, // Use secure cookies in production
-        sameSite: 'strict' // Important for cross-origin requests
+        secure: process.env.NODE_ENV === 'production', // Use secure cookies in production
+        sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax' // Important for cross-origin requests
     }
 }));
 
