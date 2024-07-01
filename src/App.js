@@ -5,6 +5,7 @@ import Login from './components/login'
 import Signup from './components/signup'
 import Dash from './components/dash';
 import './App.css';
+import EventDetails from './components/event_deatils';
 
 function App() {
   return (
@@ -16,7 +17,7 @@ function App() {
           <Route path = '/signup' element={<Signup/>}/>
           <Route path='/dash' element={<Dash/>}/>
           <Route path='/create' element={<CreateEvent/>}/>
-          {/* <Route path='/allEvent' element={<Eventget/>}/> */}
+          <Route path='/event_detail/:eventId' element={<EventDetails/>}/>
           <Route path='*' element={<Home/>}/>
         </Routes>
       </Router>

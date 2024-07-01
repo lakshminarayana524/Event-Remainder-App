@@ -39,6 +39,8 @@ h2 {
     gap: 20px;
 }
 
+
+
 .event-card {
     background-color: #e3f2fd;
     padding: 20px;
@@ -49,6 +51,7 @@ h2 {
 
 .event-card:hover {
     transform: scale(1.05);
+    cursor: pointer;
 }
 
 .event-name h3 {

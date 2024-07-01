@@ -5,9 +5,11 @@ import './styles/create.css';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { isAuth } from './auth';
+import Loader from './loader';
 
 const CreateEvent = () => {
     const navigate = useNavigate();
+    const [load ,setload]= useState(false);
     const [formData, setFormData] = useState({
         title: '',
         description: '',
@@ -16,12 +18,16 @@ const CreateEvent = () => {
     });
 
     useEffect(() => {
+        setload(true);
         const checkAuth = async () => {
             const authenticated = await isAuth(navigate);
             if (authenticated) {
                 console.log('Authenticated')
+                setload(false);
             }else{
+
                 navigate('/login');
+                setload(false);
             }   
         };
         checkAuth();
@@ -32,24 +38,33 @@ const CreateEvent = () => {
     };
 
     const handleSubmit = async (e) => {
+        setload(true);
         e.preventDefault();
         try {
             const res = await api.post('/event/create', formData);
             if (res.data.msg === 'Event Created') {
                 toast.success('Event created successfully!');
                 navigate('/dash');
+                setload(false)
             }
         } catch (error) {
             console.error('Error creating event:', error);
+            setload(false);
             toast.error('Failed to create event. Please try again.');
         }
     };
 
-    // if (!isSessionVerified) {
-    //     return <div>Loading...</div>;
-    // }
+    const handleBack = ()=>{
+        navigate('/dash');
+    }
+
+    if (load) {
+        return<Loader/>;
+    }
 
     return (
+        <div className="container">
+            <button className='button-back' onClick={handleBack}>Back</button>
         <div className="create-event-container">
             <h2>Create Event</h2>
             <form onSubmit={handleSubmit}>
@@ -60,6 +75,7 @@ const CreateEvent = () => {
                 <button type="submit">Create Event</button>
             </form>
             <ToastContainer />
+        </div>
         </div>
     );
 };

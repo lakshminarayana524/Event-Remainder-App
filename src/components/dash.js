@@ -3,6 +3,7 @@ import EventsSchedule from './eventsSchedule';
 import './styles/dash.css';
 import { useNavigate } from 'react-router-dom';
 import { isAuth } from './auth';
+import { ToastContainer } from 'react-toastify';
 
 const Dash = () => {
     const navigate = useNavigate();
@@ -26,6 +27,7 @@ const Dash = () => {
             <button className='add-button' onClick={handleAdd}>
                 <i className='fas fa-plus'></i>
             </button>
+            <ToastContainer/>
         </div>
     );
 };
