@@ -47,7 +47,7 @@ const verifySession = (req, res) => {
   try {
       const token = req.cookies.token;
       if (!token) {
-          return res.status(401).json({ isAuthenticated: false, msg: 'No token, authorization denied' });
+          return res.status(401).json({ isAuthenticated: false, msg: 'No token, authorization denied auth' });
       }
       const decoded = jwt.verify(token, process.env.SESSION_SECRET);
       res.status(200).json({ isAuthenticated: true, user: decoded });
