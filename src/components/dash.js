@@ -3,7 +3,8 @@ import EventsSchedule from './eventsSchedule';
 import './styles/dash.css';
 import { useNavigate } from 'react-router-dom';
 import { isAuth } from './auth';
-import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import { ToastContainer, toast } from 'react-toastify';
 
 const Dash = () => {
     const navigate = useNavigate();

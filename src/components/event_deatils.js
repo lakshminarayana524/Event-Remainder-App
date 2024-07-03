@@ -3,6 +3,9 @@ import { useNavigate, useParams } from 'react-router-dom';
 import api from '../api';
 import Loader from './loader';
 import './styles/event_details.css';
+import 'react-toastify/dist/ReactToastify.css';
+import { ToastContainer, toast } from 'react-toastify';
+
 
 const EventDetails = () => {
     const { eventId } = useParams();
@@ -62,6 +65,21 @@ const EventDetails = () => {
         }
     };
 
+    const handleDelete = async()=>{
+        setLoad(true);
+        try{
+            await api.delete(`/event/delete/${eventId}`)
+            // console.log("Delete: "+eventId)
+            toast.success("Successfully deleted");
+            navigate('/dash')
+            setLoad(false);
+        }catch(err){
+            toast.error("Deletion falied")
+            console.log("Unable to delete" + err);
+            setLoad(false);
+        }
+    }
+
     const handleBack = ()=>{
         navigate('/dash');
     }
@@ -91,7 +109,10 @@ const EventDetails = () => {
                                     <p className="label">Reminder Date:</p>
                                     <p className="value">{new Date(event.reminderDate).toLocaleDateString()} {new Date(event.reminderDate).toLocaleTimeString([], {hour: '2-digit', minute: '2-digit'})}</p>
                                 </div>
-                                <button className="edit-button" onClick={handleEdit}>Edit</button>
+                                <div className="buttons-conitions">
+                                    <button className="edit-button" onClick={handleEdit}>Edit</button>
+                                    <button className="delete-button" onClick={handleDelete}>Delete</button>
+                                </div>
                             </>
                         ) : (
                             <div className="edit-form">
@@ -130,6 +151,7 @@ const EventDetails = () => {
                     </div>
                 </div>
             </div>
+            <ToastContainer/>
         </div>
     );
 };

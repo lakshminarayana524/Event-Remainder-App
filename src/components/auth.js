@@ -4,7 +4,7 @@ import 'react-toastify/dist/ReactToastify.css';
 
 export const isAuth = async (navigate) => {
     try {
-        const response = await api.get('/auth/verify-session', { withCredentials: true });
+        const response = await api.get('/auth/verify-session');
         if (response.data.isAuthenticated) {
             return true;
         } else {

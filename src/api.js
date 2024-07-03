@@ -1,7 +1,9 @@
 // api.js
 import axios from 'axios';
+import { toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
-axios.defaults.withCredentials=true;
+
 
 const api = axios.create({
     baseURL: 'https://event-remainder-app.onrender.com/api',
@@ -11,6 +13,7 @@ const api = axios.create({
 
 api.interceptors.request.use(config => {
     const token = localStorage.getItem('token');
+
     if (token) {
         config.headers.Authorization = `Bearer ${token}`;
     }

@@ -2,26 +2,34 @@ import React, { useEffect, useState } from 'react';
 import './styles/eventsch.css';
 import api from '../api';
 import { useNavigate } from 'react-router-dom';
+import Loader from './loader';
 
 const EventsSchedule = () => {
     const [events, setEvents] = useState([]);
     const navigate = useNavigate();
+    const [load ,setload] =useState(false);
 
     useEffect(() => {
+        setload(true)
         const fetchEvents = async () => {
             try {
                 const response = await api.get('/event/getevents');
                 setEvents(response.data);
+                setload(false)
             } catch (error) {
                 console.error('Error fetching events:', error);
+                setload(false)
             }
         };
         fetchEvents();
     }, []);
 
     const handleClick=(eventId)=>{
-        console.log("Schedule:" + eventId)
+        // console.log("Schedule:" + eventId)
         navigate(`/event_detail/${eventId}`);
+    }
+    if(load){
+        return <Loader/>
     }
 
     return (
