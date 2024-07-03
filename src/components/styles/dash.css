@@ -1,13 +1,12 @@
-/* Dash.css */
-
 .dash-container {
     position: relative;
     padding: 20px;
+    transition: filter 0.3s ease;
 }
 
-.add-button {
+.add-button,
+.logout-button {
     position: fixed;
-    top: 50px;
     right: 20px;
     background-color: #007bff;
     color: #fff;
@@ -24,7 +23,34 @@
     transition: background-color 0.3s, transform 0.3s;
 }
 
+.add-button {
+    top: 50px;
+}
+
 .add-button:hover {
     background-color: #0056b3;
     transform: scale(1.1);
+}
+
+.logout-button {
+    top: 130px;
+    background-color: #dc3545;
+}
+
+.logout-button:hover {
+    background-color: #c82333;
+    animation: vibrate 0.3s linear infinite;
+}
+
+.logout-button:hover ~ .dash-container {
+    filter: blur(5px);
+}
+
+/* Vibration keyframes */
+@keyframes vibrate {
+    0% { transform: translate(0); }
+    25% { transform: translate(-2px, 2px); }
+    50% { transform: translate(2px, -2px); }
+    75% { transform: translate(-2px, -2px); }
+    100% { transform: translate(2px, 2px); }
 }
