@@ -1,10 +1,18 @@
 const User = require('../models/user');
 const bcrypt = require('bcryptjs');
 
+// Function to format phone number with +91 prefix
+const formatPhoneNumber = (phoneNumber) => {
+    return `+91${phoneNumber.replace(/\D/g, '')}`;
+};
+
 const registerUser = async (req, res) => {
     const { email, password, phoneNumber, name } = req.body;
     try {
-        const user = new User({ email, password, phoneNumber, name });
+        // Format the phone number
+        const formattedPhoneNumber = formatPhoneNumber(phoneNumber);
+
+        const user = new User({ email, password, phone: formattedPhoneNumber, name });
         await user.save();
         res.status(201).json({ msg: 'User Created Successfully', userId: user._id });
     } catch (err) {
@@ -40,7 +48,7 @@ const verifySession = async (req, res) => {
         if (!user) {
             return res.status(401).json({ isAuthenticated: false, msg: 'User not found' });
         }
-        res.status(200).json({ isAuthenticated: true, user: { _id: user._id, email: user.email, name: user.name, phoneNumber: user.phoneNumber } });
+        res.status(200).json({ isAuthenticated: true, user: { _id: user._id, email: user.email, name: user.name, phoneNumber: user.phone } });
     } catch (err) {
         res.status(500).json({ error: err.message });
     }

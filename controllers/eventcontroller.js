@@ -2,19 +2,19 @@ const Event = require('../models/event');
 const User = require('../models/user');
 const cron = require('node-cron');
 const sendEmail = require('../config/mail');
+const sendSMS = require('../config/msg');
 
 const getEvents = async (req, res) => {
     try {
         const userId = req.headers['user-id'];
-
         const events = await Event.find({ user: userId });
-
         res.json(events);
     } catch (err) {
-        console.error("Error fetching events:", err); // Log any errors that occur
+        console.error("Error fetching events:", err);
         res.status(500).json({ error: err.message });
     }
 };
+
 const CreateEvent = async (req, res) => {
     try {
         const userId = req.headers['user-id'];
@@ -47,8 +47,6 @@ const CreateEvent = async (req, res) => {
         const savedEvent = await newEvent.save();
 
         const reminderDateTime = new Date(reminderDate);
-                // console.log("remainder : "+reminderDateTime);
-
         const cronTime = `${reminderDateTime.getMinutes()} ${reminderDateTime.getHours()} ${reminderDateTime.getDate()} ${reminderDateTime.getMonth() + 1} *`;
 
         const cronJob = cron.schedule(cronTime, async () => {
@@ -56,17 +54,18 @@ const CreateEvent = async (req, res) => {
             const maxAttempts = 3;
             while (attempts < maxAttempts) {
                 try {
-                    console.log(`Attempt ${attempts + 1}: Sending reminder email...`);
+                    console.log(`Attempt ${attempts + 1}: Sending reminder email and SMS...`);
                     await sendEmail(user.email, 'Event Reminder', `Hello ${user.name}, this is a reminder for your event: ${title}`);
+                    await sendSMS(user.phone, `Hello ${user.name}, this is a reminder for your event: ${title}`);
                     newEvent.notified = true;
                     await newEvent.save();
-                    console.log("Reminder email sent successfully");
+                    console.log("Reminder email and SMS sent successfully");
                     break;
                 } catch (error) {
                     console.error(`Error sending reminder on attempt ${attempts + 1}:`, error);
                     attempts += 1;
                     if (attempts === maxAttempts) {
-                        console.error("Failed to send reminder email after multiple attempts");
+                        console.error("Failed to send reminder email and SMS after multiple attempts");
                     } else {
                         await new Promise(resolve => setTimeout(resolve, 5000)); // wait 5 seconds before retrying
                     }
@@ -74,7 +73,6 @@ const CreateEvent = async (req, res) => {
             }
         });
 
-        // Save the cron job reference
         savedEvent.cronJob = cronJob;
         await savedEvent.save();
 
@@ -85,7 +83,6 @@ const CreateEvent = async (req, res) => {
         res.status(500).json({ error: err.message });
     }
 };
-
 
 const getbyId = async (req, res) => {
     const eventId = req.params.eventId;
@@ -105,78 +102,68 @@ const getbyId = async (req, res) => {
 const updateEvent = async (req, res) => {
     const { eventId } = req.params;
     try {
-        const eventup = await Event.findById(eventId);
-        if (eventup) {
-            eventup.title = req.body.title;
-            eventup.description = req.body.description;
-            eventup.eventDate = req.body.eventDate;
-            eventup.reminderDate = req.body.reminderDate;
-
-            // Cancel existing cron job if it exists
-            if (eventup.cronJob) {
-                eventup.cronJob.stop();
-                eventup.cronJob = null;
-            }
-
-            // Schedule a new cron job
-            const reminderDateTime = new Date(eventup.reminderDate);
-            const cronTime = `${reminderDateTime.getMinutes()} ${reminderDateTime.getHours()} ${reminderDateTime.getDate()} ${reminderDateTime.getMonth() + 1} *`;
-
-            const cronJob = cron.schedule(cronTime, async () => {
-                let attempts = 0;
-                const maxAttempts = 3;
-                while (attempts < maxAttempts) {
-                    try {
-                        console.log(`Attempt ${attempts + 1}: Sending reminder email...`);
-                        await sendEmail(eventup.user.email, 'Event Reminder', `Hello ${eventup.user.name}, this is a reminder for your event: ${eventup.title}`);
-                        eventup.notified = true;
-                        await eventup.save();
-                        console.log("Reminder email sent successfully");
-                        break;
-                    } catch (error) {
-                        console.error(`Error sending reminder on attempt ${attempts + 1}:`, error);
-                        attempts += 1;
-                        if (attempts === maxAttempts) {
-                            console.error("Failed to send reminder email after multiple attempts");
-                        } else {
-                            await new Promise(resolve => setTimeout(resolve, 5000)); // wait 5 seconds before retrying
-                        }
-                    }
-                }
-            });
-
-            // Save the cron job reference
-            eventup.cronJob = cronJob;
-
-            await eventup.save();
-
-            console.log("Successfully Event " + eventup.title + " Updated");
-            res.json({ msg: "Event Updated", event: eventup });
-        } else {
-            console.log("Unable to update event");
-            res.status(404).json({ msg: "Event not found" });
+        let event = await Event.findById(eventId).populate('user');
+        if (!event) {
+            return res.status(404).json({ error: 'Event not found' });
         }
+
+        // Update event details
+        event.title = req.body.title;
+        event.description = req.body.description;
+        event.eventDate = req.body.eventDate;
+        event.reminderDate = req.body.reminderDate;
+
+        // Save the updated event
+        await event.save();
+
+        // Cancel existing cron job if it exists
+        if (event.cronJob) {
+            event.cronJob.stop();
+        }
+
+        // Schedule a new cron job for the updated event
+        const reminderDateTime = new Date(event.reminderDate);
+        const cronTime = `${reminderDateTime.getMinutes()} ${reminderDateTime.getHours()} ${reminderDateTime.getDate()} ${reminderDateTime.getMonth() + 1} *`;
+
+        const cronJob = cron.schedule(cronTime, async () => {
+            try {
+                console.log(`Sending reminder email and SMS for Event: ${event.title}`);
+                await sendEmail(event.user.email, 'Event Reminder', `Hello ${event.user.name}, this is a reminder for your event: ${event.title}`);
+                await sendSMS(event.user.phone, `Hello ${event.user.name}, this is a reminder for your event: ${event.title}`);
+                event.notified = true;
+                await event.save();
+                console.log("Reminder email and SMS sent successfully");
+            } catch (error) {
+                console.error("Error sending reminder:", error);
+            }
+        });
+
+        event.cronJob = cronJob;
+        await event.save();
+
+        console.log("Event updated successfully:", event.title);
+        res.json({ msg: "Event updated successfully", event });
     } catch (err) {
-        console.log("Unable to update event", err);
-        res.status(500).json({ msg: "Unable to update event", err });
+        console.error("Event update error:", err);
+        res.status(500).json({ error: err.message });
     }
 };
-
 
 const DeleteEvent = async (req, res) => {
     const { eventId } = req.params;
     try {
-        const eventdel = await Event.findByIdAndDelete({ _id: eventId });
-        if (eventdel) {
-            console.log("Successfully Event " + eventdel.title + " Deleted");
-            res.json({ msg: "Event Deleted", event: eventdel });
-        } else {
-            console.log("Unable to delete event");
-            res.json({ msg: "Unable to delete event" });
+        const deletedEvent = await Event.findByIdAndDelete(eventId);
+        if (!deletedEvent) {
+            return res.status(404).json({ error: 'Event not found' });
         }
+        if (deletedEvent.cronJob) {
+            deletedEvent.cronJob.stop();
+        }
+        console.log("Event Deleted");
+        res.json({ msg: "Event Deleted", event: deletedEvent });
     } catch (err) {
-        console.log("Unable to delete event", err);
-        res.json({ msg: "Unable to delete event", err });
+        console.log("Event deletion error:", err);
+        res.status(500).json({ error: err.message });
     }
 };
 
