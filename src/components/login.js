@@ -10,7 +10,6 @@ const Login = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [loading, setLoading] = useState(false);
-    const [islog, setlog] = useState(false);
     const navigate = useNavigate();
 
     const handleSubmit = async (e) => {
@@ -22,6 +21,7 @@ const Login = () => {
 
             if (res.data.msg === 'Login Successful') {
                 localStorage.setItem('token', res.data.token);
+                localStorage.setItem('userId', res.data.userId); // Store userId
                 navigate('/dash');
                 setLoading(false);
             } else {
