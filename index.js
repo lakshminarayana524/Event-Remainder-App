@@ -29,18 +29,18 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cookieParser());
 
 // Session setup
-app.use(session({
-  secret: process.env.SESSION_SECRET,
-  resave: false,
-  saveUninitialized: false,
-  store: MongoStore.create({ mongoUrl: process.env.MONGO_URL }),
-  cookie: {
-    maxAge: 1000 * 60 * 60 * 3, // 3 hours
-    httpOnly: true,
-    secure: process.env.NODE_ENV === 'production', // Use secure cookies in production
-    sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'Strict' // Important for cross-origin requests
-  }
-}));
+// app.use(session({
+//   secret: process.env.SESSION_SECRET,
+//   resave: false,
+//   saveUninitialized: false,
+//   store: MongoStore.create({ mongoUrl: process.env.MONGO_URL }),
+//   cookie: {
+//     maxAge: 1000 * 60 * 60 * 3, // 3 hours
+//     httpOnly: true,
+//     secure: process.env.NODE_ENV === 'production', // Use secure cookies in production
+//     sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'Strict' // Important for cross-origin requests
+//   }
+// }));
 
 // Routes
 app.get('/', (req, res) => {
