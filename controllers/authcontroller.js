@@ -3,7 +3,8 @@ const User = require('../models/user');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 
-const generateToken = (user) => {
+const generateToken = (
+    user) => {
     return jwt.sign({ id: user._id, email: user.email }, process.env.SESSION_SECRET, { expiresIn:'3h' });
 };
 

@@ -154,4 +154,18 @@
         }
     };
 
-    module.exports = { CreateEvent, getEvents,getbyId,updateEvent };
+    const DeleteEvent = async(req,res) =>{
+        const eventId = req.params.eventId;
+
+        try{
+            const event = await Event.findByIdAndDelete({_id:eventId})
+            if(!event) return res.status(404).json({msg:"Event Not Found"})
+                console.log("Successully Deleted Event "+event.title)
+                res.status(200).json({msg:"Successfully Deleted"})
+        }catch (err){
+            console.log("Unable to delete Event "+err)
+            res.status(500).json({msg:"unable to delete Event"})
+        }
+    }
+
+    module.exports = { CreateEvent, getEvents,getbyId,updateEvent,DeleteEvent };
